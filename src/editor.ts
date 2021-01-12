@@ -12,7 +12,7 @@ import {
 } from 'lit-element';
 import { HomeAssistant, fireEvent, LovelaceCardEditor, ActionConfig } from 'custom-card-helpers';
 
-import { BoilerplateCardConfig } from './types';
+import { EntitiesTableCardConfig } from './types';
 
 const options = {
   required: {
@@ -55,15 +55,15 @@ const options = {
   },
 };
 
-@customElement('boilerplate-card-editor')
-export class BoilerplateCardEditor extends LitElement implements LovelaceCardEditor {
+@customElement('entities-table-card-editor')
+export class EntitiesTableCardEditor extends LitElement implements LovelaceCardEditor {
   @property({ attribute: false }) public hass?: HomeAssistant;
-  @internalProperty() private _config?: BoilerplateCardConfig;
+  @internalProperty() private _config?: EntitiesTableCardConfig;
   @internalProperty() private _toggle?: boolean;
   @internalProperty() private _helpers?: any;
   private _initialized = false;
 
-  public setConfig(config: BoilerplateCardConfig): void {
+  public setConfig(config: EntitiesTableCardConfig): void {
     this._config = config;
 
     this.loadCardHelpers();
@@ -114,7 +114,7 @@ export class BoilerplateCardEditor extends LitElement implements LovelaceCardEdi
     this._helpers.importMoreInfoControl('climate');
 
     // You can restrict on domain type
-    const entities = Object.keys(this.hass.states).filter(eid => eid.substr(0, eid.indexOf('.')) === 'sun');
+    const entities = Object.keys(this.hass.states).filter(eid => eid.substr(0, eid.indexOf('.')) === 'sensor');
 
     return html`
       <div class="card-config">
