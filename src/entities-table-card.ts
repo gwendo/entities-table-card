@@ -15,9 +15,6 @@ import {classMap} from 'lit-html/directives/class-map'
 import {
   HomeAssistant,
   hasConfigOrEntityChanged,
-  hasAction,
-  ActionHandlerEvent,
-  handleAction,
   LovelaceCardEditor,
   getLovelace,
 } from 'custom-card-helpers'; // This is a community maintained npm module with common helper functions/types
@@ -25,7 +22,6 @@ import {HassEntity} from 'home-assistant-js-websocket';
 import './editor';
 
 import type { EntitiesColumnConfig, EntitiesTableCardConfig } from './types';
-import { actionHandler } from './action-handler-directive';
 import { CARD_VERSION } from './const';
 import { localize } from './localize/localize';
 
@@ -47,12 +43,17 @@ console.info(
 // TODO Name your custom element
 @customElement('entities-table-card')
 export class EntitiesTableCard extends LitElement {
-  public static async getConfigElement(): Promise<LovelaceCardEditor> {
+/*   public static async getConfigElement(): Promise<LovelaceCardEditor> {
     return document.createElement('entities-table-card-editor');
-  }
+  } */
 
   public static getStubConfig(): object {
-    return {};
+    return {
+      name: "My Entity Table",
+      showSummary: false,
+      entities: [],
+      dataColumns: []
+    };
   }
 
   // TODO Add any properities that should cause your element to re-render here
@@ -67,9 +68,6 @@ export class EntitiesTableCard extends LitElement {
       throw new Error(localize('common.invalid_configuration'));
     }
 
-    if (config.test_gui) {
-      getLovelace().setEditMode(true);
-    }
 
     this.config = {
       name: 'EntitiesTable',
@@ -87,22 +85,10 @@ export class EntitiesTableCard extends LitElement {
   }
 
   protected render(): TemplateResult | void {
-    if (this.config.show_warning) {
-      return this._showWarning(localize('common.show_warning'));
-    }
-
-    if (this.config.show_error) {
-      return this._showError(localize('common.show_error'));
-    }
     
     return html`
       <ha-card
         .header=${this.config.name}
-        @action=${this._handleAction}
-        .actionHandler=${actionHandler({
-          hasHold: hasAction(this.config.hold_action),
-          hasDoubleClick: hasAction(this.config.double_tap_action),
-        })}
         tabindex="0"
         .label=${`EntitiesTable: ${this.config.entity || 'No Entity Defined'}`}
       >
@@ -174,31 +160,7 @@ export class EntitiesTableCard extends LitElement {
     </td>`
   }
 
-  private _handleAction(ev: ActionHandlerEvent): void {
-    if (this.hass && this.config && ev.detail.action) {
-      handleAction(this, this.hass, this.config, ev.detail.action);
-    }
-  }
-
-  private _showWarning(warning: string): TemplateResult {
-    return html`
-      <hui-warning>${warning}</hui-warning>
-    `;
-  }
-
-  private _showError(error: string): TemplateResult {
-    const errorCard = document.createElement('hui-error-card');
-    errorCard.setConfig({
-      type: 'error',
-      error,
-      origConfig: this.config,
-    });
-
-    return html`
-      ${errorCard}
-    `;
-  }
-
+  
   // https://lit-element.polymer-project.org/guide/styles
   static get styles(): CSSResult {
     return css`
