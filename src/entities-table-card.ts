@@ -111,9 +111,9 @@ export class EntitiesTableCard extends LitElement {
   }
 
   private _renderSummary(): TemplateResult {
-    if (this.config.showSummary) {
+    if (this.config.dataColumns?.filter(dc => dc.showSummary) !== undefined) {
       return html`${this.config.dataColumns?.map(col => {
-        if (col.format === 'currency') {
+        if (col.showSummary) {
           const total = this.config.entities?.map(ent => this.hass.states[ent.entity].attributes[col.attr]).reduce((sum, currVal) => sum + currVal)
           const classes = { summary: true, currency: true, positive: total > 0, negative: total < 0}
           return html`<td class=${classMap(classes)}>${Math.round(total)}</td>`
@@ -133,18 +133,23 @@ export class EntitiesTableCard extends LitElement {
           return this._renderCurrency(entity, col);
         case 'percentage':
           return this._renderPercentage(entity, col);
-        case 'default':
+        default:
           return this._renderDefault(entity, col);
       }
     })}</tr>`
   }
   private _renderDefault(entity: HassEntity, col: EntitiesColumnConfig): TemplateResult {
-    return html`<td>
-      ${entity.attributes[col.attr]}
+    const classes = {}
+    if (col.format) {
+      classes[col.format] = true;
+    }
+    
+    return html`<td class=${classMap(classes)} >
+      ${this._getData(entity, col)}
     </td>`
   }
   private _renderPercentage(entity: HassEntity, col: EntitiesColumnConfig): TemplateResult {
-    const amount = entity.attributes[col.attr];
+    const amount = this._getData(entity, col)
     const classes = { percentage: true, positive: amount > 0, negative: amount < 0 }
     return html`<td class=${classMap(classes)}>
     ${ 
@@ -153,11 +158,19 @@ export class EntitiesTableCard extends LitElement {
   }
 
   private _renderCurrency(entity: HassEntity, col: EntitiesColumnConfig): TemplateResult {
-    const amount = entity.attributes[col.attr];
+    const amount = this._getData(entity, col);
     const classes = { currency: true, positive: amount > 0, negative: amount < 0 }
     return html`<td class=${classMap(classes)}>
       ${ Math.round(amount).toLocaleString(navigator.language) }
     </td>`
+  }
+
+  private _getData(entity: HassEntity, col: EntitiesColumnConfig): any {
+    if (col.source === 'state') {
+      return entity.state;
+    } else {
+      return entity.attributes[col.attr];
+    }
   }
 
   
@@ -174,6 +187,9 @@ export class EntitiesTableCard extends LitElement {
           text-align: right;
       }
       .percentage {
+          text-align: right;
+      }
+      .number {
           text-align: right;
       }
       .positive {

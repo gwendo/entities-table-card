@@ -12,14 +12,15 @@ export interface EntitiesTableCardConfig extends LovelaceCardConfig {
   type: string;
   name?: string;
   entities?: EntityConfig[];
-  showSummary?: boolean;
   dataColumns?: EntitiesColumnConfig[];
 }
 
 export interface EntitiesColumnConfig {
   header: string;
+  source?: 'attr' | 'state';
   attr: string;
   format?: 'currency' | 'percentage';
+  showSummary?: boolean;
 }
 
 export interface EntityConfig {
