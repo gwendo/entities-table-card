@@ -22,17 +22,18 @@ Hey dude! Help me out for a couple of :beers: or a :coffee:!
 | ----------------- | ------- | ------------ | ------------------------------------------- | ------------------- |
 | type              | string  | **Required** | `custom:entities-table-card                 |                     |
 | name              | string  | **Optional** | Card name                                   | `Entity Table`      |
-| showSummary       | boolean | **Optional** | Whether to show a summary of currency type attributes | `Entity Table`      |
 | entities          | array   | **Optional** | List of Home Assistant entity IDs           | `none`              |
 | dataColumns       | array   | **Optional** | List of Column config                       | `none`              |
 
 ## Column Config
 
-| Name            | Type   | Requirement  | Description                                         | Default     |
-| --------------- | ------ | ------------ | ----------------------------------------------      | ----------- |
-| header          | string | **Required** | Column header text                                  | `more-info` |
-| attr            | string | **Required** | Attribute name holding the data for the column      | `none`      |
-| format          | string | **Optional** | currency or percentage or null                      | `none`      |
+| Name            | Type    | Requirement  | Description                                           | Default     |
+| --------------- | ------- | ------------ | ----------------------------------------------------- | ----------- |
+| header          | string  | **Required** | Column header text                                    | `more-info` |
+| source          | string  | **Optional** | state or attr                                         | `attr`      |
+| attr            | string  | **Required** | Attribute name holding the data for the column        | `none`      |
+| format          | string  | **Optional** | currency, percentage, number or null                  | `none`      |
+| showSummary     | boolean | **Optional** | Whether to show a summary of currency type attributes | `false`     |
 
 
 ## Examples
@@ -42,7 +43,6 @@ Hey dude! Help me out for a couple of :beers: or a :coffee:!
 ``` yaml
 type: 'custom:entities-table-card'
 name: Portfolio
-showSummary: true
 entities:
   - entity: sensor.avanza_stock_513577
   - entity: sensor.avanza_stock_26607
@@ -51,18 +51,20 @@ entities:
  dataColumns:
   - header: Name
     attr: name
-  - header: Daily
-    attr: changePercent
-    format: percentage
+  - header: State
+    source: state
+    format: number
   - header: '%'
     attr: profitLossPercentage
     format: percentage
   - header: Profit/Loss
     attr: totalProfitLoss
     format: currency
+    showSummary: true
   - header: Value
     attr: totalValue
     format: currency
+    showSummary: true
 ```
 
 ### Together with auto-entities
@@ -91,9 +93,11 @@ card:
     - header: Profit/Loss
       attr: totalProfitLoss
       format: currency
+      showSummary: true
     - header: Value
       attr: totalValue
       format: currency
+      showSummary: true
 ```
 
 [commits-shield]: https://img.shields.io/github/commit-activity/y/gwendo/entities-table-card.svg?style=for-the-badge
