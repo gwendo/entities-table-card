@@ -80,8 +80,28 @@ export class EntitiesTableCard extends LitElement {
     if (!this.config) {
       return false;
     }
+    return this.hasConfigOrEntityChanged(this, changedProps, false);
+  }
 
-    return hasConfigOrEntityChanged(this, changedProps, false);
+  private hasConfigOrEntityChanged(
+    element: any,
+    changedProps: PropertyValues,
+    forceUpdate: Boolean,
+  ): boolean {
+
+    if (changedProps.has('config') || forceUpdate) {
+      return true;
+    }
+    if (element.config!.entities) {
+      const oldHass = changedProps.get('hass') as HomeAssistant | undefined;
+      if (oldHass && element.config) {
+        return element.config!.entities.some( (el) => {
+          return oldHass.states[el.entity].state !== element.hass!.states[el.entity].state;})
+      }
+      return true;
+    } else {
+      return false;
+    }
   }
 
   protected render(): TemplateResult | void {
