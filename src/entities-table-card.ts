@@ -86,7 +86,7 @@ export class EntitiesTableCard extends LitElement {
   private hasConfigOrEntityChanged(
     element: any,
     changedProps: PropertyValues,
-    forceUpdate: Boolean,
+    forceUpdate: boolean,
   ): boolean {
 
     if (changedProps.has('config') || forceUpdate) {
