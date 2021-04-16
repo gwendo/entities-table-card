@@ -20,6 +20,7 @@ export interface EntitiesColumnConfig {
   source?: 'attr' | 'state';
   attr: string;
   format?: 'currency' | 'percentage';
+  type?: 'number' | 'date';
   showSummary?: boolean;
 }
 

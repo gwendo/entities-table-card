@@ -134,9 +134,9 @@ export class EntitiesTableCard extends LitElement {
     if (this.config.dataColumns?.filter(dc => dc.showSummary) !== undefined) {
       return html`${this.config.dataColumns?.map(col => {
         if (col.showSummary) {
-          const total = this.config.entities?.map(ent => this.hass.states[ent.entity].attributes[col.attr]).reduce((sum, currVal) => sum + currVal)
+          const total = this.config.entities?.map(ent => this.hass.states[ent.entity].attributes[col.attr]).reduce((sum, currVal) => sum + isNaN(currVal) ? 0 : currVal)
           const classes = { summary: true, currency: true, positive: total > 0, negative: total < 0}
-          return html`<td class=${classMap(classes)}>${Math.round(total)}</td>`
+          return html`<td class=${classMap(classes)}>${Math.round(total).toLocaleString(navigator.language)}</td>`
         } else {
           return html`<td class="summary"></td>`
         }
@@ -163,6 +163,10 @@ export class EntitiesTableCard extends LitElement {
     if (col.format) {
       classes[col.format] = true;
     }
+    switch (col.type || 'default') {
+      case 'number':
+        classes['number'] = true
+    }
     
     return html`<td class=${classMap(classes)} >
       ${this._getData(entity, col)}
@@ -173,7 +177,7 @@ export class EntitiesTableCard extends LitElement {
     const classes = { percentage: true, positive: amount > 0, negative: amount < 0 }
     return html`<td class=${classMap(classes)}>
     ${ 
-      amount
+      amount.toFixed(2)
     }</td>`
   }
 
@@ -187,6 +191,9 @@ export class EntitiesTableCard extends LitElement {
 
   private _getData(entity: HassEntity, col: EntitiesColumnConfig): any {
     if (col.source === 'state') {
+      if (col.type == 'number') {
+        return Number(entity.state).toFixed(2)
+      }
       return entity.state;
     } else {
       return entity.attributes[col.attr];
