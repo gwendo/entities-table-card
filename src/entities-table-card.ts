@@ -134,7 +134,9 @@ export class EntitiesTableCard extends LitElement {
     if (this.config.dataColumns?.filter(dc => dc.showSummary) !== undefined) {
       return html`${this.config.dataColumns?.map(col => {
         if (col.showSummary) {
-          const total = this.config.entities?.map(ent => this.hass.states[ent.entity].attributes[col.attr]).reduce((sum, currVal) => sum + isNaN(currVal) ? 0 : currVal)
+          const total = this.config.entities?.map(
+              ent => this.hass.states[ent.entity].attributes[col.attr])
+              .reduce((sum, currVal) => sum + (isNaN(currVal) ? 0 : currVal))
           const classes = { summary: true, currency: true, positive: total > 0, negative: total < 0}
           return html`<td class=${classMap(classes)}>${Math.round(total).toLocaleString(navigator.language)}</td>`
         } else {
